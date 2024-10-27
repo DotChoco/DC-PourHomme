@@ -46,8 +46,11 @@ namespace DC_PourHomme.Backend
                 dataBase.Update();
             }
         }
-        
-        void AddAnItem(Parfum parfum) => dataBase.Parfums.Add(parfum);
 
+        void AddAnItem(Parfum parfum)
+        {
+            dataBase.Parfums.Add(parfum);
+            dataBase.Update();
+        }
     }
 }

@@ -4,11 +4,10 @@ namespace DC_PourHomme.Models
 
     public enum ParfumType
     {
-        EAU_DE_PARFUM,
+        EDP,
         PARFUM,
-        EAU_DE_TOILETTE,
-        EAU_DE_COLOGNE,
-        EAU_FRAICHE,
+        EDT,
+        COLOGNE,
         NONE
     }
 
@@ -18,6 +17,7 @@ namespace DC_PourHomme.Models
         MAN,
         DELUXE_MAN,
         OLD_MAN,
+        ALL_AGES,
         NONE
     }
     
@@ -89,18 +89,25 @@ namespace DC_PourHomme.Models
         public string Description { get; set; } = string.Empty;
     }
 
+    public enum InCollection
+    {
+        NO,
+        YES,
+        PENDENT
+    }
+
     public class Parfum
     {
-        public string Name { get; set; } = "Unknown";
-        public string Description { get; set; } = string.Empty;
-        public string OwnNote { get; set; } = string.Empty;
-        public string Brand { get; set; } = "Unknown";
-        public ParfumType Type { get; set; }
-        public List<ParfumNotes> Notes { get; set; } = new();
-        public ParfumAgeSegment AgeSegment { get; set; }
-        public Occasion Occasion { get; set; }
-        public Season Season { get; set; }
-        int ReleaseYear { get; set; }
+        public string? Name { get; set; } = "Unknown";
+        public string? Description { get; set; } = string.Empty;
+        public string? Brand { get; set; } = "Unknown";
+        public ParfumType? Type { get; set; }
+        public List<ParfumNotes>? Notes { get; set; } = new();
+        public ParfumAgeSegment? AgeSegment { get; set; } = ParfumAgeSegment.MAN;
+        public Occasion? Occasion { get; set; } = Models.Occasion.NONE;
+        public Season? Season { get; set; } = Models.Season.NONE;
+        public InCollection? InCollection { get; set; } = Models.InCollection.NO;
+        int? YearEdition { get; set; } = 2024;
     }
 
 }

@@ -2,18 +2,14 @@
 namespace DC_PourHomme.Render
 {
     using Backend;
-    using Microsoft.Win32.SafeHandles;
     using Models;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
 
     public class Render
     {
         Backend? backend = new();
         (int, int) pageIndexer = default;
         int pageDivisor = default;
-        const string Separator = "|---------------------|---------------------|----------------|----------------|";
+        const string Separator = "|---------------------|---------------------|----------------|----------------|----------------|";
         const char Roof = (char)45;
         const char Wall = (char)124;
         const char Space = (char)32;
@@ -45,32 +41,27 @@ namespace DC_PourHomme.Render
             PrintControls();
             TableHead();
 
-            TestMultipleItems();
+            //TestMultipleItems();
 
+            
 
-            if (backend.dataBase.Parfums != null)
-            {
-                if(backend.dataBase.Parfums.Count <= ParfumsPerPage)
-                    pageIndexer = new(Min_Page, Min_Page);
-                else
-                    pageIndexer = new(Min_Page, (backend.dataBase.Parfums.Count + ParfumsPerPage - 1) / ParfumsPerPage);
-                PrintPage(new(Min_Page - 1, ParfumsPerPage));
-            }
-
+            LoadTable();
             PrintPageNumber();
+            //backend.dataBase.Parfums = new();
             MainPageInputRaw();
 
         }
 
 
-        string FormatItemLine()
+        private string FormatItemLine()
         {
                 return Wall + FormatText("Name") + Wall + FormatText("Brand")
                     + Wall + FormatText("Season", Small_Field_Spaces) 
-                    + Wall + FormatText("Occasion", Small_Field_Spaces) + Wall;
+                    + Wall + FormatText("Occasion", Small_Field_Spaces)
+                    + Wall + FormatText("InCollection", Small_Field_Spaces) + Wall;
         }
 
-        string FormatText(string data, byte fieldSpaces = Large_Field_Spaces)
+        private string FormatText(string data, byte fieldSpaces = Large_Field_Spaces)
         {
             int freeSpaces = fieldSpaces - data.Length;
             string restData = string.Empty;
@@ -83,7 +74,7 @@ namespace DC_PourHomme.Render
             return new string(Space, freeSpaces / 2) + data + new string(Space, (freeSpaces + 1) / 2);
         }
 
-        void Title()
+        private void Title()
         {
             string title =
                "   ▒░▒░░▓▒         \n" +
@@ -105,7 +96,7 @@ namespace DC_PourHomme.Render
 
         }
 
-        void PrintControls(bool SearchPage = false)
+        private void PrintControls(bool SearchPage = false)
         {
             string addItem = "[A/a] Add Item";
             string searchItem = "[S/s] Search Item";
@@ -122,60 +113,17 @@ namespace DC_PourHomme.Render
             Console.ForegroundColor = ConsoleColor.White;
         }
     
-        void TestSingleItem()
+        private void TableHead()
         {
-            PrintParfumes(new()
-            {
-                Name = "The One For Men Eau De Parfum",
-                Brand = "Jean Paul Gultier Gultier",
-                Season = Season.COLD_SEASON,
-                Occasion = Occasion.BEAST_MODE
-            });
-        }
-
-        void TestMultipleItems()
-        {
-            for (int h = 0; h < 10; h++)
-            {
-                backend.dataBase.Parfums.Add(new()
-                {
-                    Name = "The One For Men Eau De Parfum",
-                    Brand = "Jean Paul Gultier Gultier",
-                    Season = Season.COLD_SEASON,
-                    Occasion = Occasion.BEAST_MODE
-                });
-            }
-            for (int h = 0; h < 10; h++)
-            {
-                backend.dataBase.Parfums.Add(new()
-                {
-                    Name = "Intense Eau De Parfum",
-                    Brand = "Hugo Boss",
-                    Season = Season.COLD_SEASON,
-                    Occasion = Occasion.BEAST_MODE
-                });
-            }
-            for (int h = 0; h < 5; h++)
-            {
-                backend.dataBase.Parfums.Add(new()
-                {
-                    Name = "Pour Homme",
-                    Brand = "Dolce & Gabana",
-                    Season = Season.COLD_SEASON,
-                    Occasion = Occasion.BEAST_MODE
-                });
-            }
-        }
-        
-        void TableHead()
-        {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine(Separator);
             Console.WriteLine(FormatItemLine());
             Console.WriteLine(Separator);
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(Separator);
         }
         
-        void PrintParfumes(Parfum data, byte fieldSpaces = Large_Field_Spaces)
+        private void PrintParfumes(Parfum data, byte fieldSpaces = Large_Field_Spaces)
         {
             int freeSpaces = fieldSpaces - data.Name.Length,
                 counter = default;
@@ -191,6 +139,7 @@ namespace DC_PourHomme.Render
             result += tupleBrand.Item1.Item1 + Wall;
             result += FormatText(data.Season.ToString(), Small_Field_Spaces) + Wall;
             result += FormatText(data.Occasion.ToString(), Small_Field_Spaces) + Wall;
+            result += FormatText(data.InCollection.ToString(), Small_Field_Spaces) + Wall;
 
             while(true)
             {
@@ -228,6 +177,7 @@ namespace DC_PourHomme.Render
 
                 result += FormatText(string.Empty, Small_Field_Spaces) + Wall;
                 result += FormatText(string.Empty, Small_Field_Spaces) + Wall;
+                result += FormatText(string.Empty, Small_Field_Spaces) + Wall;
                 counter++;
                 if (!tupleBrand.Item2 && !tupleName.Item2)
                     break;
@@ -238,9 +188,7 @@ namespace DC_PourHomme.Render
             Console.WriteLine(Separator);
         }
 
-
-
-        Tuple<Tuple<string, string>, bool> FormatParfumeData(string data, byte fieldSpaces = 21)
+        private Tuple<Tuple<string, string>, bool> FormatParfumeData(string data, byte fieldSpaces = Large_Field_Spaces)
         {
             string restData = string.Empty, newdata = string.Empty;
             int freeSpaces = fieldSpaces - data.Length;
@@ -259,7 +207,6 @@ namespace DC_PourHomme.Render
                             newdata += data[h];
                         }
 
-                        //data = data.Replace(restData, string.Empty);
                         if (newdata[newdata.Length - 1] == Space)
                             newdata = newdata.Remove(data.Length - 1);
 
@@ -281,8 +228,7 @@ namespace DC_PourHomme.Render
             return new(new(new string(Space, freeSpaces / 2) + data + new string(Space, (freeSpaces + 1) / 2), restData), false);
         }
 
-
-        void PrintPage(Tuple<int, int> startEndIndexes)
+        private void PrintPage(Tuple<int, int> startEndIndexes)
         {
             for (int i = startEndIndexes.Item1; i < startEndIndexes.Item2; i++)
             {
@@ -290,43 +236,54 @@ namespace DC_PourHomme.Render
             }
         }
 
-        void PrintPageNumber()
+        private void PrintPageNumber()
         {
-            Console.WriteLine($"\n\t\t\t{pageIndexer.Item1} / {pageIndexer.Item2}");
+            Console.WriteLine($"\n\t\t\t\t\t\t{pageIndexer.Item1} / {pageIndexer.Item2}");
         }
 
-
-        void MainPageInputRaw()
+        private void MainPageInputRaw()
         {
             int index = default; 
             ConsoleKey? input = default;
             while (true)
             {
                 input = Console.ReadKey().Key;
+
+                Console.WriteLine("\x1b[3J");
+                Console.Clear();
+
                 if (input == ConsoleKey.E)
                     break;
                 if (input == ConsoleKey.S)
                 {
-                    Console.Clear();
-                    Title();
-                    PrintControls(true);
-                    Console.ReadLine();
-                    break;
+                    //Title();
+                    //PrintControls(true);
+                    backend.dataBase.Parfums = SearchItem.Search(backend.dataBase.Parfums);
                 }
                 if (input == ConsoleKey.A)
                 {
-                    Console.Clear();
+                    Parfum data = AddItem.NewParfum();
+                    if (data != null)
+                        backend.AddItem(data);
                     Title();
                     PrintControls();
-                    Console.ReadLine();
-                    break;
+                    TableHead();
+                    if (index == null || index == 0)
+                        LoadTable();
+                    else
+                    {
+                        if (pageIndexer.Item1 == pageIndexer.Item2)
+                            PrintPage(new(index - ParfumsPerPage, backend.dataBase.Parfums.Count));
+                        else
+                            PrintPage(new(index - ParfumsPerPage, index));
+                    }
+
+                    PrintPageNumber();
                 }
                 if (input == ConsoleKey.LeftArrow)
                 {
                     if(pageIndexer.Item1 > Min_Page)
                     {
-                        Console.WriteLine("\x1b[3J");
-                        Console.Clear();
                         Title();
                         PrintControls();
                         TableHead();
@@ -340,8 +297,6 @@ namespace DC_PourHomme.Render
                 {
                     if (pageIndexer.Item1 < pageIndexer.Item2)
                     {
-                        Console.WriteLine("\x1b[3J");
-                        Console.Clear();
                         Title();
                         PrintControls();
                         TableHead();
@@ -361,7 +316,22 @@ namespace DC_PourHomme.Render
 
         }
 
-
+        private void LoadTable()
+        {
+            if (backend.dataBase.Parfums != null)
+            {
+                if (backend.dataBase.Parfums.Count <= ParfumsPerPage)
+                {
+                    pageIndexer = new(Min_Page, Min_Page);
+                    PrintPage(new(Min_Page - 1, backend.dataBase.Parfums.Count));
+                }
+                else
+                {
+                    pageIndexer = new(Min_Page, (backend.dataBase.Parfums.Count + ParfumsPerPage - 1) / ParfumsPerPage);
+                    PrintPage(new(Min_Page - 1, ParfumsPerPage));
+                }
+            }
+        }
 
     }
 

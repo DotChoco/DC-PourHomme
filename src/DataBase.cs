@@ -38,8 +38,9 @@ namespace DC_PourHomme.Backend
             Parfums.Clear();
             StreamReader sr = new(fullPath);
             string data = sr.ReadToEnd();
+            sr.Close();
             if(data != null && data != string.Empty)
-                Parfums = JsonSerializer.Deserialize<List<Parfum>>(sr.ReadToEnd());
+                Parfums = JsonSerializer.Deserialize<List<Parfum>>(data);
         }
 
         void UpdateDB()
